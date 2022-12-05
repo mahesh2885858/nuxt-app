@@ -1,63 +1,169 @@
 <template>
   <div class="register-form-container">
     <h2>Register</h2>
-    <form
-      @submit="
-        (e) => {
-          e.preventDefault();
-        }
-      "
-    >
+    <form @submit="onSubmit">
       <div class="field name">
         <label for="name">Name:</label>
-        <input type="text" id="name" placeholder="Name" spellcheck="false" />
+        <input
+          type="text"
+          :value="inputs.name.value"
+          @input="(e) => onInput(e, 'name')"
+          id="name"
+          placeholder="Name"
+          spellcheck="false"
+        />
+        <p v-if="inputs.name.error.length >= 1" style="color: red">
+          {{ inputs.name.error }}
+        </p>
       </div>
       <div class="field email">
         <label for="email">Email:</label>
-        <input type="email" id="email" placeholder="Email" spellcheck="false" />
+        <input
+          type="email"
+          :value="inputs.email.value"
+          @input="(e) => onInput(e, 'email')"
+          id="email"
+          placeholder="Email"
+          spellcheck="false"
+        />
+        <p v-if="inputs.email.error.length >= 1" style="color: red">
+          {{ inputs.email.error }}
+        </p>
       </div>
       <div class="field username">
         <label for="username">Username:</label>
         <input
+          :value="inputs.username.value"
+          @input="(e) => onInput(e, 'username')"
           type="text"
           id="username"
           placeholder="Username"
           spellcheck="false"
         />
+        <p v-if="inputs.username.error.length >= 1" style="color: red">
+          {{ inputs.username.error }}
+        </p>
       </div>
       <div class="field password">
         <label for="password">Password:</label>
         <input
           type="password"
+          :value="inputs.password.value"
+          @input="(e) => onInput(e, 'password')"
           id="password"
           placeholder="Password"
           spellcheck="false"
         />
+        <p v-if="inputs.password.error.length >= 1" style="color: red">
+          {{ inputs.password.error }}
+        </p>
       </div>
       <div class="field cpassword">
         <label for="cpassword">Cofirm Password:</label>
         <input
           type="password"
           id="cpassword"
+          :value="inputs.cpassword.value"
+          @input="(e) => onInput(e, 'cpassword')"
           placeholder="Cofirm Password"
           spellcheck="false"
         />
+        <p v-if="inputs.cpassword.error.length >= 1" style="color: red">
+          {{ inputs.cpassword.error }}
+        </p>
       </div>
 
       <div class="terms">
-        <input type="checkbox" id="terms" />
+        <input
+          type="checkbox"
+          id="terms"
+          :value="inputs.isTermsAccedpted.value"
+          @input="(e) => onInput(e, 'isTermsAccedpted')"
+        />
         <label for="terms">Accept Terms and Conditions</label>
       </div>
+      <p v-if="inputs.isTermsAccedpted.error.length >= 1" style="color: red">
+        {{ inputs.isTermsAccedpted.error }}
+      </p>
       <button>Register</button>
     </form>
     <p>Already have an account <NuxtLink to="/login">Click here</NuxtLink></p>
   </div>
 </template>
-<script setup>
+
+<script setup lang="ts">
 definePageMeta({
   layout: "background",
 });
+const inputs = reactive({
+  name: {
+    value: "",
+    error: "",
+  },
+
+  email: {
+    value: "",
+    error: "",
+  },
+  username: {
+    value: "",
+    error: "",
+  },
+  password: {
+    value: "",
+    error: "",
+  },
+  cpassword: {
+    value: "",
+    error: "",
+  },
+  isTermsAccedpted: {
+    value: false,
+    error: "",
+  },
+});
+const onInput = (e: Event, field: keyof typeof inputs) => {
+  if (field === "isTermsAccedpted") {
+    inputs[field].value = (e.target as HTMLInputElement).checked;
+    inputs[field].error = "";
+    return;
+  } else {
+    inputs[field].value = (e.target as HTMLInputElement).value;
+    inputs[field].error = "";
+  }
+};
+const onSubmit = async (e: Event) => {
+  e.preventDefault();
+  const inputValues: {
+    field: keyof typeof inputs;
+    length?: number;
+    checked?: boolean;
+  }[] = [
+    { field: "name", length: inputs.name.value.trim().length },
+    { field: "email", length: inputs.email.value.trim().length },
+    { field: "username", length: inputs.username.value.trim().length },
+    { field: "password", length: inputs.password.value.trim().length },
+    { field: "cpassword", length: inputs.cpassword.value.trim().length },
+    { field: "isTermsAccedpted", checked: inputs.isTermsAccedpted.value },
+  ];
+  inputValues.forEach((input) => {
+    if (input.field === "isTermsAccedpted") {
+      if (!input.checked) {
+        inputs[input.field].error = "Please accept terms and conditions";
+      } else return;
+    } else {
+      if (input.length! <= 3) {
+        inputs[
+          input.field
+        ].error = `${input.field} should be more than 3 characters`;
+      } else return;
+    }
+  });
+  const data = await fetch("/api/test");
+  console.log(await data.json());
+};
 </script>
+
 <style scoped>
 .register-form-container {
   display: flex;
