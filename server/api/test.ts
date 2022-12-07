@@ -3,7 +3,6 @@ import UserModel from "~~/models/User";
 export default defineEventHandler(async (event) => {
   try {
     await connectToMongo();
-
     const userDetaisFromBody = new UserModel({
       cpassword: "1123",
       password: "1123",

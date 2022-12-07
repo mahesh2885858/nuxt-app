@@ -2,10 +2,7 @@ import mongoose from "mongoose";
 
 const connectToMongo = async () => {
   return mongoose
-    .connect(
-      // "mongodb+srv://mahesh2885858:8096723745@cluster0.7fcuy.mongodb.net/?retryWrites=true&w=majority"
-      "mongodb://localhost:8081/test"
-    )
+    .connect("mongodb://127.0.0.1:27017")
     .then(() => {
       console.log("connection was successfull");
     })

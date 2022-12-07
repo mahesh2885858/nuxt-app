@@ -5,14 +5,7 @@
   </Head>
   <div class="login-form-container">
     <p class="login-title">Login</p>
-    <form
-      @submit="
-        (e) => {
-          e.preventDefault();
-        }
-      "
-      class="login-form"
-    >
+    <form @submit="onSubmit" class="login-form">
       <label for="username">
         <span>Username: </span>
       </label>
@@ -121,4 +114,18 @@
 definePageMeta({
   layout: "background",
 });
+const onSubmit = async (e) => {
+  e.preventDefault();
+
+  try {
+    console.log("calling");
+    const data = await $fetch("/api/login", {
+      method: "post",
+      body: { test: 123 },
+    });
+    console.log(data);
+  } catch (err) {
+    console.log(err);
+  }
+};
 </script>
